@@ -18,7 +18,8 @@ import {
   Settings,
   Building,
   HelpCircle,
-  X
+  X,
+  LogOut
 } from 'lucide-react';
 
 export type NavTab =
@@ -52,7 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onClose
 }) => {
-  const { currentUser, currentRole, hasPermission } = useAuth();
+  const { currentUser, currentRole, hasPermission, logout } = useAuth();
   const { t, isKhmer } = useLanguage();
 
   interface NavItem {
@@ -284,18 +285,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Current User Session Bar at bottom of sidebar */}
       <div className="p-3 bg-slate-950/80 border-t border-slate-800 shrink-0">
-        <div className="flex items-center gap-2.5 p-2 rounded-xl bg-slate-900 border border-slate-800/80">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
-            {currentUser.fullName.charAt(0)}
+        <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-900 border border-slate-800/80">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+              {currentUser.fullName.charAt(0)}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-white truncate leading-tight">
+                {isKhmer && currentUser.khmerName ? currentUser.khmerName : currentUser.fullName}
+              </p>
+              <p className="text-[10px] text-indigo-400 font-medium truncate">
+                {currentRole.name} • {currentUser.department}
+              </p>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-white truncate leading-tight">
-              {isKhmer && currentUser.khmerName ? currentUser.khmerName : currentUser.fullName}
-            </p>
-            <p className="text-[10px] text-indigo-400 font-medium truncate">
-              {currentRole.name} • {currentUser.department}
-            </p>
-          </div>
+          <button
+            onClick={() => logout()}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors shrink-0"
+            title={isKhmer ? 'ចាកចេញពីប្រព័ន្ធ (Log Out)' : 'Log Out'}
+            aria-label="Log out"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>

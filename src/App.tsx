@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { AuthProvider } from './context/AuthContext.tsx';
+import { AuthProvider, useAuth } from './context/AuthContext.tsx';
 import { NotificationProvider, useNotification } from './context/NotificationContext.tsx';
 import { LanguageProvider, useLanguage } from './context/LanguageContext.tsx';
+import { LoginPage } from './components/auth/LoginPage.tsx';
 import { Header } from './components/layout/Header.tsx';
 import { Sidebar, NavTab } from './components/layout/Sidebar.tsx';
 import { Dashboard } from './components/dashboard/Dashboard.tsx';
@@ -18,7 +19,7 @@ import { TelegramCenter } from './components/telegram/TelegramCenter.tsx';
 import { UserManagement } from './components/users/UserManagement.tsx';
 import { AuditLogViewer } from './components/audit/AuditLogViewer.tsx';
 import { SystemSettingsView } from './components/settings/SystemSettingsView.tsx';
-import { X, CheckCircle, AlertTriangle, Info, AlertCircle } from 'lucide-react';
+import { X, CheckCircle, AlertTriangle, Info, AlertCircle, Building2 } from 'lucide-react';
 
 const ToastContainer: React.FC = () => {
   const { toasts, removeToast } = useNotification();
@@ -179,12 +180,43 @@ const MainLayout: React.FC = () => {
   );
 };
 
+const AppContent: React.FC = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+  const { isKhmer } = useLanguage();
+
+  if (isLoading) {
+    return (
+      <div className={`h-screen w-screen flex flex-col items-center justify-center bg-slate-900 text-white ${isKhmer ? 'font-khmer' : 'font-sans'}`}>
+        <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-600/30 mb-4 animate-pulse">
+          <Building2 className="w-8 h-8" />
+        </div>
+        <div className="flex items-center gap-2 text-indigo-400 text-sm font-semibold mb-2">
+          <div className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+          <span>{isKhmer ? 'កំពុងដំណើរការប្រព័ន្ធ...' : 'Connecting to EduTrack MIS...'}</span>
+        </div>
+        <p className="text-xs text-slate-400">Phnom Penh International Academy</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <>
+        <LoginPage />
+        <ToastContainer />
+      </>
+    );
+  }
+
+  return <MainLayout />;
+};
+
 export default function App() {
   return (
     <AuthProvider>
       <LanguageProvider>
         <NotificationProvider>
-          <MainLayout />
+          <AppContent />
         </NotificationProvider>
       </LanguageProvider>
     </AuthProvider>

@@ -12,7 +12,8 @@ import {
   ChevronDown,
   Building2,
   Menu,
-  Languages
+  Languages,
+  LogOut
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -28,7 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenTelegram,
   onToggleMobileMenu
 }) => {
-  const { currentUser, currentRole, switchUser, allUsers, hasPermission } = useAuth();
+  const { currentUser, currentRole, switchUser, allUsers, hasPermission, logout } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead, clearAll, showToast } = useNotification();
   const { language, toggleLanguage, t, isKhmer } = useLanguage();
 
@@ -286,17 +287,40 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Quick RBAC Switcher Dropdown */}
             {isUserMenuOpen && (
-              <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 p-2 animate-in fade-in-50 zoom-in-95 duration-150">
-                <div className="px-3 py-2 bg-slate-50 rounded-xl mb-2">
-                  <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
-                    {t('header.switchRole', 'Switch Test Account / Role (RBAC)')}
-                  </p>
-                  <p className="text-[11px] text-slate-600 mt-0.5">
-                    {t('header.switchDesc', 'Test how permissions filter views, departments, and editing rules.')}
-                  </p>
+              <div className="absolute right-0 mt-2 w-72 sm:w-84 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 p-2 animate-in fade-in-50 zoom-in-95 duration-150">
+                {/* Active User Card */}
+                <div className="p-3 bg-gradient-to-br from-indigo-50/80 to-slate-50 rounded-xl border border-indigo-100/60 mb-2">
+                  <div className="flex items-center gap-2.5">
+                    <img
+                      src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop'}
+                      alt=""
+                      className="w-10 h-10 rounded-xl object-cover ring-2 ring-indigo-200 shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-bold text-slate-900 truncate">
+                        {isKhmer && currentUser.khmerName ? currentUser.khmerName : currentUser.fullName}
+                      </p>
+                      <p className="text-[10px] text-slate-500 truncate font-mono">{currentUser.email}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-indigo-600 text-white uppercase tracking-wider">
+                          {currentRole.name}
+                        </span>
+                        <span className="text-[10px] text-slate-500 truncate">• {currentUser.department}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="space-y-1 max-h-80 overflow-y-auto">
+                <div className="px-3 py-1.5 bg-slate-50 rounded-xl mb-2 flex items-center justify-between">
+                  <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
+                    {t('header.switchRole', 'Switch Role (RBAC)')}
+                  </p>
+                  <span className="text-[10px] text-slate-400 font-medium">
+                    {allUsers.length} {isKhmer ? 'គណនី' : 'accounts'}
+                  </span>
+                </div>
+
+                <div className="space-y-1 max-h-56 overflow-y-auto">
                   {allUsers.map(user => {
                     const isSelected = user.id === currentUser.id;
                     const roleBadgeColor = {
@@ -328,7 +352,7 @@ export const Header: React.FC<HeaderProps> = ({
                           <img
                             src={user.avatarUrl}
                             alt=""
-                            className="w-8 h-8 rounded-lg object-cover shrink-0"
+                            className="w-7 h-7 rounded-lg object-cover shrink-0"
                           />
                           <div className="min-w-0 truncate">
                             <p className="text-xs font-bold text-slate-900 leading-tight truncate">
@@ -348,6 +372,24 @@ export const Header: React.FC<HeaderProps> = ({
                       </button>
                     );
                   })}
+                </div>
+
+                {/* Logout Button */}
+                <div className="pt-2 border-t border-slate-100 mt-2">
+                  <button
+                    onClick={async () => {
+                      setIsUserMenuOpen(false);
+                      await logout();
+                      showToast(
+                        isKhmer ? 'បានចាកចេញពីប្រព័ន្ធដោយជោគជ័យ' : 'Logged out successfully',
+                        'info'
+                      );
+                    }}
+                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50/60 hover:bg-rose-100/80 border border-rose-200/70 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4 shrink-0" />
+                    <span>{isKhmer ? 'ចាកចេញពីប្រព័ន្ធ (Sign Out)' : 'Log Out (Sign Out)'}</span>
+                  </button>
                 </div>
               </div>
             )}

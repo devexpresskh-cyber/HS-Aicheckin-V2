@@ -49,6 +49,19 @@ export const translations: Translations = {
   'status.rejected': { en: 'Rejected', km: 'បានបដិសេធ' },
   'status.ontime': { en: 'On-time', km: 'ទាន់ពេលវេលា' },
 
+  // Authentication
+  'auth.login': { en: 'Sign In', km: 'ចូលប្រើប្រព័ន្ធ' },
+  'auth.logout': { en: 'Log Out', km: 'ចាកចេញ' },
+  'auth.signInGoogle': { en: 'Sign in with Google', km: 'ចូលប្រើតាមរយៈ Google' },
+  'auth.orEmail': { en: 'Or sign in with email & password', km: 'ឬចូលប្រើដោយអ៊ីមែល និងពាក្យសម្ងាត់' },
+  'auth.demoAccounts': { en: 'Quick Demo Login', km: 'ចូលប្រើគណនីសាកល្បង' },
+  'auth.email': { en: 'Email address or Staff ID', km: 'អាសយដ្ឋានអ៊ីមែល ឬលេខកូដបុគ្គលិក' },
+  'auth.password': { en: 'Password', km: 'ពាក្យសម្ងាត់' },
+  'auth.confirmLogout': { en: 'Are you sure you want to log out?', km: 'តើអ្នកពិតជាចង់ចាកចេញពីប្រព័ន្ធមែនទេ?' },
+  'auth.switchAccount': { en: 'Switch Account', km: 'ប្តូរគណនី' },
+  'auth.welcomeBack': { en: 'Welcome back', km: 'សូមស្វាគមន៍មកកាន់ប្រព័ន្ធ' },
+  'auth.institutionalLogin': { en: 'Faculty & Staff MIS Portal', km: 'ច្រកចូលប្រព័ន្ធកត់ត្រាវត្តមាន និងកាលវិភាគ' },
+
   // Header
   'header.kiosk': { en: 'Mobile Check-in Kiosk', km: 'ចំណុចស្កេនចល័ត' },
   'header.detectAbsences': { en: 'Detect Absences', km: 'ស្វែងរកអវត្តមាន' },
