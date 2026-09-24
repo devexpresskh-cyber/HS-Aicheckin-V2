@@ -90,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+    <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs print:hidden">
       <div className="flex items-center justify-between px-3 sm:px-6 h-16 max-w-full">
         
         {/* Left: Mobile Menu Button & Organization Branding */}

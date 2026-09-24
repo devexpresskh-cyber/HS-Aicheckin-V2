@@ -26,7 +26,7 @@ const ToastContainer: React.FC = () => {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+    <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none print:hidden">
       {toasts.map(toast => {
         const icons = {
           success: <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />,
@@ -118,7 +118,7 @@ const MainLayout: React.FC = () => {
   };
 
   return (
-    <div className={`h-screen flex flex-col overflow-hidden bg-slate-100 antialiased text-slate-900 selection:bg-indigo-500 selection:text-white ${isKhmer ? 'font-khmer' : 'font-sans'}`}>
+    <div className={`h-screen flex flex-col overflow-hidden bg-slate-100 antialiased text-slate-900 selection:bg-indigo-500 selection:text-white print:h-auto print:overflow-visible print:bg-white ${isKhmer ? 'font-khmer' : 'font-sans'}`}>
       
       {/* Top Global Header with zero overlap */}
       <Header
@@ -129,7 +129,7 @@ const MainLayout: React.FC = () => {
       />
 
       {/* Main Body with side-by-side flex layout (Desktop) / Slide-over (Mobile) */}
-      <div className="flex flex-1 min-h-0 overflow-hidden relative">
+      <div className="flex flex-1 min-h-0 overflow-hidden relative print:overflow-visible print:h-auto print:block">
         
         {/* Left Navigation Sidebar */}
         <Sidebar
@@ -142,9 +142,9 @@ const MainLayout: React.FC = () => {
           onClose={() => setIsMobileMenuOpen(false)}
         />
 
-        {/* Main Content Viewport: min-w-0 ensures no horizontal overflow */}
-        <main className="flex-1 min-w-0 h-full overflow-y-auto p-4 sm:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto">
+        {/* Main Content Viewport: min-w-0 ensures no horizontal overflow, w-full for full-width layout */}
+        <main className="flex-1 min-w-0 h-full overflow-y-auto p-3 sm:p-5 lg:p-6 print:p-0 print:overflow-visible print:h-auto print:block">
+          <div className="w-full">
             {renderContent()}
           </div>
         </main>

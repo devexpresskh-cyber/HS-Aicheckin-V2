@@ -304,13 +304,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       {/* Desktop Sidebar: in-flow flex child, fills remaining viewport height, always fixed in view */}
-      <aside className="hidden lg:flex lg:flex-col w-64 shrink-0 bg-slate-900 border-r border-slate-800 h-full overflow-hidden select-none z-20">
+      <aside className="hidden lg:flex lg:flex-col w-64 shrink-0 bg-slate-900 border-r border-slate-800 h-full overflow-hidden select-none z-20 print:hidden">
         {renderNavContent()}
       </aside>
 
       {/* Mobile Slide-over Drawer with Backdrop */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex">
+        <div className="fixed inset-0 z-50 lg:hidden flex print:hidden">
           {/* Backdrop */}
           <div
             onClick={onClose}

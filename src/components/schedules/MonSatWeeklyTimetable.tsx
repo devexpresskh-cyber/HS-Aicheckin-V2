@@ -20,7 +20,8 @@ import {
   Sparkles,
   DollarSign,
   Sliders,
-  Coffee
+  Coffee,
+  Building2
 } from 'lucide-react';
 
 export interface WeekDayDef {
@@ -85,6 +86,7 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
   canCreate = true
 }) => {
   const { isKhmer } = useLanguage();
+  const systemSettings = StorageService.getSystemSettings();
 
   const [selectedTeacher, setSelectedTeacher] = useState<string>(initialTeacherFilter);
   const [selectedClass, setSelectedClass] = useState<string>('All');
@@ -214,7 +216,7 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
   return (
     <div className="space-y-4">
       {/* Timetable Filter Toolbar */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-4 sm:p-5 shadow-xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+      <div className="bg-white rounded-3xl border border-slate-200 p-4 sm:p-5 shadow-xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 print:hidden">
         {/* Left Filters */}
         <div className="flex flex-wrap items-center gap-2.5">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700">
@@ -308,7 +310,7 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
       </div>
 
       {/* Weekly Schedule Banner Info */}
-      <div className="bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white rounded-3xl p-5 shadow-md flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white rounded-3xl p-5 shadow-md flex flex-wrap items-center justify-between gap-4 print:hidden">
         <div>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-indigo-300">
@@ -350,17 +352,100 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
         </div>
       </div>
 
+      {/* Printable Official Timetable Header - Only visible during print */}
+      <div className="hidden print:block mb-4 border-b-2 border-slate-900 pb-3">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-xl">
+              <Building2 className="w-6 h-6 text-indigo-400" />
+            </div>
+            <div>
+              <h1 className="text-xl font-black text-slate-950 uppercase tracking-tight">
+                {isKhmer ? (systemSettings.khmerOrgName || systemSettings.organizationName) : systemSettings.organizationName}
+              </h1>
+              <h2 className="text-sm font-extrabold text-indigo-900 mt-0.5 font-khmer">
+                {isKhmer ? 'កាលវិភាគបង្រៀនប្រចាំសប្តាហ៍ (ចន្ទ ដល់ សៅរ៍)' : 'OFFICIAL WEEKLY TEACHING TIMETABLE (MONDAY – SATURDAY)'}
+              </h2>
+            </div>
+          </div>
+
+          <div className="text-right text-xs space-y-0.5">
+            <div className="font-bold text-slate-900">
+              <span className="text-slate-500 font-normal">{isKhmer ? 'ឆ្នាំសិក្សា៖ ' : 'Academic Year: '}</span>
+              2025–2026
+            </div>
+            <div className="text-slate-600 font-medium">
+              <span className="text-slate-500 font-normal">{isKhmer ? 'កាលបរិច្ឆេទបោះពុម្ព៖ ' : 'Printed Date: '}</span>
+              {new Date().toLocaleDateString(isKhmer ? 'km-KH' : 'en-US', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+              })}
+            </div>
+            <div className="text-[11px] font-mono text-slate-500">
+              {new Date().toLocaleTimeString(isKhmer ? 'km-KH' : 'en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Filter / Scope summary strip */}
+        <div className="mt-2.5 pt-2 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-800">
+          <div className="flex items-center gap-4">
+            <div>
+              <span className="font-bold text-slate-500 uppercase text-[10px] block">{isKhmer ? 'សាស្រ្តាចារ្យ / គ្រូបង្រៀន' : 'Teacher / Faculty'}</span>
+              <span className="font-extrabold text-slate-900">
+                {selectedTeacher === 'All'
+                  ? (isKhmer ? 'គ្រប់គ្រូទាំងអស់ (All Faculty)' : 'All Teachers')
+                  : teachers.find(t => t.id === selectedTeacher)?.fullName || selectedTeacher}
+              </span>
+            </div>
+
+            <div className="h-6 w-px bg-slate-300" />
+
+            <div>
+              <span className="font-bold text-slate-500 uppercase text-[10px] block">{isKhmer ? 'កម្រិតថ្នាក់' : 'Class / Grade'}</span>
+              <span className="font-extrabold text-slate-900">
+                {selectedClass === 'All'
+                  ? (isKhmer ? 'គ្រប់ថ្នាក់ទាំងអស់ (All Classes)' : 'All Classes')
+                  : selectedClass}
+              </span>
+            </div>
+
+            {selectedRoom !== 'All' && (
+              <>
+                <div className="h-6 w-px bg-slate-300" />
+                <div>
+                  <span className="font-bold text-slate-500 uppercase text-[10px] block">{isKhmer ? 'បន្ទប់សិក្សា' : 'Room'}</span>
+                  <span className="font-extrabold text-slate-900">{selectedRoom}</span>
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="text-right">
+            <span className="font-bold text-slate-500 uppercase text-[10px] block">{isKhmer ? 'ម៉ោងបង្រៀនសរុប' : 'Total Active Sessions'}</span>
+            <span className="font-mono font-black text-indigo-900 text-sm">
+              {filteredSchedules.length} {isKhmer ? 'វេន' : 'Classes'}
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Mon-Sat Header Weekly Timetable Grid */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[960px]">
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden timetable-print-wrapper print:border-none print:shadow-none print:rounded-none">
+        <div className="overflow-x-auto print:overflow-visible">
+          <table className="w-full text-left border-collapse min-w-[960px] timetable-print-table print:min-w-0 print:w-full print:border print:border-slate-500">
             {/* Table Header: Mon - Sat */}
             <thead>
-              <tr className="bg-slate-900 text-white divide-x divide-slate-800">
+              <tr className="bg-slate-900 text-white divide-x divide-slate-800 print:bg-slate-100 print:text-black print:divide-slate-400 print:border-b-2 print:border-slate-500">
                 {/* Period / Time Slot Column */}
-                <th className="w-40 py-3.5 px-4 text-xs font-black uppercase tracking-wider text-slate-300 sticky left-0 bg-slate-900 z-10">
+                <th className="w-40 py-3.5 px-4 text-xs font-black uppercase tracking-wider text-slate-300 sticky left-0 bg-slate-900 z-10 print:static print:bg-slate-100 print:text-black print:border print:border-slate-400">
                   <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-indigo-400" />
+                    <Clock className="w-3.5 h-3.5 text-indigo-400 print:text-slate-700" />
                     <span>{isKhmer ? 'វេន / ម៉ោង' : 'Period / Time'}</span>
                   </div>
                 </th>
@@ -373,36 +458,36 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
                   return (
                     <th
                       key={day.index}
-                      className={`py-3.5 px-3 text-center transition-colors relative ${
+                      className={`py-3.5 px-3 text-center transition-colors relative print:static print:bg-slate-100 print:text-black print:border print:border-slate-400 ${
                         isToday ? 'bg-indigo-950 text-indigo-100' : 'bg-slate-900'
                       }`}
                     >
                       {/* Highlight bar for current day */}
                       {isToday && (
-                        <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-400" />
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-400 print:hidden" />
                       )}
 
                       <div className="flex flex-col items-center justify-center">
                         <div className="flex items-center gap-1">
-                          <span className="text-xs font-black uppercase tracking-wider">
+                          <span className="text-xs font-black uppercase tracking-wider print:text-black">
                             {day.shortEn}
                           </span>
-                          <span className="text-[11px] font-khmer font-bold text-indigo-300">
+                          <span className="text-[11px] font-khmer font-bold text-indigo-300 print:text-slate-800">
                             ({day.shortKm})
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="text-[10px] text-slate-400 font-normal">
+                          <span className="text-[10px] text-slate-400 print:text-slate-600 font-normal">
                             {isKhmer ? day.fullKm : day.fullEn}
                           </span>
                           {sessionCount > 0 && (
-                            <span className="text-[9px] font-mono font-bold bg-indigo-500/30 text-indigo-200 px-1.5 py-0.2 rounded-full">
+                            <span className="text-[9px] font-mono font-bold bg-indigo-500/30 text-indigo-200 print:bg-slate-200 print:text-black px-1.5 py-0.2 rounded-full">
                               {sessionCount}
                             </span>
                           )}
                         </div>
                         {isToday && (
-                          <span className="inline-block mt-1 text-[9px] font-extrabold uppercase tracking-wider bg-emerald-500 text-slate-950 px-1.5 py-0.2 rounded">
+                          <span className="inline-block mt-1 text-[9px] font-extrabold uppercase tracking-wider bg-emerald-500 text-slate-950 px-1.5 py-0.2 rounded print:hidden">
                             {isKhmer ? 'ថ្ងៃនេះ' : 'Today'}
                           </span>
                         )}
@@ -414,20 +499,20 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
             </thead>
 
             {/* Timetable Body */}
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-slate-200 print:divide-slate-400">
               {periodSlots.map((period, pIdx) => {
                 // If this slot is configured as a Break or Lunch interval
                 if (period.isBreak || period.sessionType === 'Break') {
                   return (
-                    <tr key={period.id || `break-${period.periodNumber}-${pIdx}`} className="bg-amber-50/70 border-y border-amber-200/90">
-                      <td className="py-2.5 px-3.5 font-mono font-bold text-amber-900 text-xs sticky left-0 bg-amber-50/95 z-10 border-r border-amber-200">
+                    <tr key={period.id || `break-${period.periodNumber}-${pIdx}`} className="bg-amber-50/70 border-y border-amber-200/90 print:bg-slate-100 print:border print:border-slate-400">
+                      <td className="py-2.5 px-3.5 font-mono font-bold text-amber-900 text-xs sticky left-0 bg-amber-50/95 z-10 border-r border-amber-200 print:static print:bg-slate-100 print:text-black print:border print:border-slate-400">
                         <div className="flex items-center justify-between gap-1">
                           <div className="flex items-center gap-1.5">
-                            <Coffee className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                            <Coffee className="w-3.5 h-3.5 text-amber-600 print:text-slate-700 shrink-0" />
                             <span>{period.startTime} – {period.endTime}</span>
                           </div>
                           {canEdit && (
-                            <div className="flex items-center gap-0.5">
+                            <div className="flex items-center gap-0.5 print:hidden">
                               <button
                                 type="button"
                                 onClick={() => {
@@ -472,7 +557,7 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
                       </td>
                       <td
                         colSpan={displayDays.length}
-                        className="py-2.5 px-4 text-center text-xs font-bold text-amber-900 tracking-wide"
+                        className="py-2.5 px-4 text-center text-xs font-bold text-amber-900 tracking-wide print:text-black print:border print:border-slate-400"
                       >
                         <span className="font-khmer">
                           ☕ {period.khmerPeriodName || period.periodName} ({period.periodName}) • {period.durationMinutes || 120} {isKhmer ? 'នាទី' : 'mins'}
@@ -483,20 +568,20 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
                 }
 
                 return (
-                  <tr key={period.id || `period-${period.periodNumber}-${pIdx}`} className="divide-x divide-slate-100 hover:bg-slate-50/50 transition-colors">
+                  <tr key={period.id || `period-${period.periodNumber}-${pIdx}`} className="divide-x divide-slate-100 hover:bg-slate-50/50 transition-colors print:divide-slate-400 print:border-b print:border-slate-400">
                     {/* Period Header Column */}
-                    <td className="py-4 px-3.5 align-top bg-slate-50/90 sticky left-0 z-10 border-r border-slate-200">
+                    <td className="py-4 px-3.5 align-top bg-slate-50/90 sticky left-0 z-10 border-r border-slate-200 print:static print:bg-slate-50 print:border print:border-slate-400 print:p-2">
                       <div className="flex flex-col">
                         <div className="flex items-center justify-between gap-1">
                           <span
-                            className="inline-block px-2 py-0.5 rounded-lg text-[11px] font-black uppercase tracking-wider text-white shadow-2xs w-fit"
+                            className="inline-block px-2 py-0.5 rounded-lg text-[11px] font-black uppercase tracking-wider text-white shadow-2xs w-fit print:text-black print:bg-slate-200 print:border print:border-slate-400"
                             style={{ backgroundColor: period.color || '#4F46E5' }}
                           >
                             {period.periodName}
                           </span>
 
                           {canEdit && (
-                            <div className="flex items-center gap-0.5">
+                            <div className="flex items-center gap-0.5 print:hidden">
                               <button
                                 type="button"
                                 onClick={() => {
@@ -544,16 +629,16 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
                         </div>
 
                         {period.khmerPeriodName && (
-                          <span className="text-[10px] font-khmer font-bold text-slate-500 mt-1">
+                          <span className="text-[10px] font-khmer font-bold text-slate-500 print:text-slate-700 mt-1">
                             {period.khmerPeriodName}
                           </span>
                         )}
 
                         <span className="font-mono text-xs font-extrabold text-slate-900 mt-1.5 flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-indigo-600 shrink-0" />
+                          <Clock className="w-3 h-3 text-indigo-600 print:text-slate-700 shrink-0" />
                           {period.startTime} – {period.endTime}
                         </span>
-                        <span className="text-[10px] text-slate-500 mt-0.5">
+                        <span className="text-[10px] text-slate-500 print:text-slate-600 mt-0.5">
                           {period.durationMinutes || 90} {isKhmer ? 'នាទី' : 'mins duration'}
                         </span>
                       </div>
@@ -574,12 +659,12 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
                         return (
                           <td
                             key={day.index}
-                            className={`py-3 px-2.5 align-top transition-colors ${
+                            className={`py-3 px-2.5 align-top transition-colors print:p-1.5 print:border print:border-slate-400 ${
                               isToday ? 'bg-indigo-50/20' : ''
                             }`}
                           >
                             {matchingClasses.length > 0 ? (
-                              <div className="space-y-2">
+                              <div className="space-y-2 print:space-y-1.5">
                                 {matchingClasses.map(cls => {
                                   const teacher = teachers.find(t => t.id === cls.teacherId);
                                   const cardBg = cls.color || '#4F46E5';
@@ -594,24 +679,24 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
                                       }}
                                       role="button"
                                       tabIndex={0}
-                                      className="rounded-2xl border border-slate-200 bg-white p-3 shadow-xs hover:shadow-md hover:border-indigo-400 hover:ring-2 hover:ring-indigo-100 transition-all relative overflow-hidden group cursor-pointer text-left"
+                                      className="rounded-2xl border border-slate-200 bg-white p-3 shadow-xs hover:shadow-md hover:border-indigo-400 hover:ring-2 hover:ring-indigo-100 transition-all relative overflow-hidden group cursor-pointer text-left timetable-card print:p-2 print:rounded-lg print:border print:border-slate-400 print:shadow-none"
                                       style={{ borderLeftColor: cardBg, borderLeftWidth: '4px' }}
                                     >
                                       {/* Top Row: Code & Rate */}
                                       <div className="flex items-center justify-between gap-1 mb-1">
-                                        <span className="font-mono text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100">
+                                        <span className="font-mono text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 print:bg-slate-100 print:text-black print:border-slate-300">
                                           {cls.subjectCode || 'SUB'}
                                         </span>
 
                                         <div className="flex items-center gap-1">
                                           {cls.hourlyRate && (
-                                            <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+                                            <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200 print:bg-slate-100 print:text-black print:border-slate-300">
                                               ${cls.hourlyRate.toFixed(0)}/h
                                             </span>
                                           )}
 
                                           {/* Quick Actions for Admins */}
-                                          <div className="flex items-center gap-0.5">
+                                          <div className="flex items-center gap-0.5 print:hidden">
                                             {canEdit && onEditSchedule && (
                                               <button
                                                 type="button"
@@ -643,29 +728,29 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
                                       </div>
 
                                       {/* Subject Name */}
-                                      <h4 className="text-xs font-black text-slate-900 leading-snug line-clamp-2">
+                                      <h4 className="text-xs font-black text-slate-900 leading-snug line-clamp-2 print:text-[11px] print:line-clamp-none">
                                         {cls.subject}
                                       </h4>
                                       {cls.khmerSubject && (
-                                        <p className="text-[10px] text-slate-500 font-khmer truncate mt-0.5">
+                                        <p className="text-[10px] text-slate-500 font-khmer truncate mt-0.5 print:text-slate-700 print:text-[9.5px]">
                                           {cls.khmerSubject}
                                         </p>
                                       )}
 
                                       {/* Class Grade & Room */}
-                                      <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-600">
-                                        <div className="flex items-center gap-1 font-bold text-slate-800">
-                                          <GraduationCap className="w-3 h-3 text-indigo-600 shrink-0" />
+                                      <div className="mt-2 pt-2 border-t border-slate-100 print:border-slate-300 print:mt-1.5 print:pt-1 flex items-center justify-between text-[10px] text-slate-600">
+                                        <div className="flex items-center gap-1 font-bold text-slate-800 print:text-black">
+                                          <GraduationCap className="w-3 h-3 text-indigo-600 print:text-slate-700 shrink-0" />
                                           <span className="truncate">{cls.gradeClass}</span>
                                         </div>
-                                        <div className="flex items-center gap-1 text-slate-500 font-medium">
-                                          <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                                        <div className="flex items-center gap-1 text-slate-500 print:text-slate-700 font-medium">
+                                          <MapPin className="w-3 h-3 text-slate-400 print:text-slate-600 shrink-0" />
                                           <span className="truncate">{cls.room}</span>
                                         </div>
                                       </div>
 
                                       {/* Teacher Name & Avatar */}
-                                      <div className="mt-2 pt-2 border-t border-slate-100 flex items-center gap-1.5">
+                                      <div className="mt-2 pt-2 border-t border-slate-100 print:border-slate-300 print:mt-1.5 print:pt-1 flex items-center gap-1.5">
                                         {teacher?.photoUrl ? (
                                           <img
                                             src={teacher.photoUrl}
@@ -673,11 +758,11 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
                                             className="w-5 h-5 rounded-full object-cover ring-1 ring-slate-200 shrink-0"
                                           />
                                         ) : (
-                                          <div className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-[9px] flex items-center justify-center shrink-0">
+                                          <div className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-[9px] flex items-center justify-center shrink-0 print:border print:border-slate-400">
                                             {cls.teacherName.charAt(0)}
                                           </div>
                                         )}
-                                        <span className="text-[11px] font-bold text-slate-800 truncate">
+                                        <span className="text-[11px] font-bold text-slate-800 truncate print:text-[10px]">
                                           {isKhmer && cls.khmerTeacherName ? cls.khmerTeacherName : cls.teacherName}
                                         </span>
                                       </div>
@@ -687,20 +772,23 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
                               </div>
                             ) : (
                               /* Empty Cell Slot */
-                              <div className="h-full min-h-[100px] rounded-2xl border-2 border-dashed border-slate-200/80 hover:border-indigo-300 hover:bg-indigo-50/20 transition-all flex flex-col items-center justify-center p-2 group text-slate-300 hover:text-indigo-600">
+                              <div className="h-full min-h-[100px] print:min-h-0 print:border-none print:p-0 rounded-2xl border-2 border-dashed border-slate-200/80 hover:border-indigo-300 hover:bg-indigo-50/20 transition-all flex flex-col items-center justify-center p-2 group text-slate-300 hover:text-indigo-600">
                                 {canCreate && onAddForSlot ? (
-                                  <button
-                                    onClick={() => onAddForSlot(day.index, period.periodNumber, period.startTime, period.endTime)}
-                                    className="flex flex-col items-center gap-1 text-center w-full h-full justify-center p-2"
-                                    title={`Add class for ${day.shortEn} - ${period.periodName}`}
-                                  >
-                                    <div className="w-6 h-6 rounded-full bg-slate-100 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center transition-colors">
-                                      <Plus className="w-3.5 h-3.5 text-slate-400 group-hover:text-white" />
-                                    </div>
-                                    <span className="text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                                      {isKhmer ? '+ បន្ថែម' : '+ Add Period'}
-                                    </span>
-                                  </button>
+                                  <>
+                                    <button
+                                      onClick={() => onAddForSlot(day.index, period.periodNumber, period.startTime, period.endTime)}
+                                      className="flex flex-col items-center gap-1 text-center w-full h-full justify-center p-2 print:hidden"
+                                      title={`Add class for ${day.shortEn} - ${period.periodName}`}
+                                    >
+                                      <div className="w-6 h-6 rounded-full bg-slate-100 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center transition-colors">
+                                        <Plus className="w-3.5 h-3.5 text-slate-400 group-hover:text-white" />
+                                      </div>
+                                      <span className="text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {isKhmer ? '+ បន្ថែម' : '+ Add Period'}
+                                      </span>
+                                    </button>
+                                    <span className="hidden print:inline text-slate-300 text-[10px] font-medium">-</span>
+                                  </>
                                 ) : (
                                   <span className="text-slate-300 text-[10px] font-medium">-</span>
                                 )}
@@ -715,7 +803,7 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
 
                 {/* Add Period Row */}
                 {canCreate && (
-                  <tr className="bg-slate-50/60 hover:bg-slate-100/60 transition-colors">
+                  <tr className="bg-slate-50/60 hover:bg-slate-100/60 transition-colors print:hidden">
                     <td colSpan={displayDays.length + 1} className="py-3 px-4 text-center">
                       <button
                         type="button"
@@ -736,8 +824,32 @@ export const MonSatWeeklyTimetable: React.FC<MonSatWeeklyTimetableProps> = ({
           </div>
         </div>
 
+        {/* Official Signatures Block - Only visible in print */}
+        <div className="hidden print:grid grid-cols-3 gap-6 mt-8 pt-4 border-t border-slate-400 text-center text-xs">
+          <div>
+            <p className="font-bold text-slate-900 font-khmer">{isKhmer ? 'រៀបចំដោយ' : 'Prepared By'}</p>
+            <p className="text-[10px] text-slate-500">{isKhmer ? 'មន្ត្រីកាលវិភាគ / រដ្ឋបាល' : 'Timetable Coordinator'}</p>
+            <div className="mt-14 border-b border-dotted border-slate-400 mx-8"></div>
+            <p className="text-[11px] text-slate-600 mt-1 font-medium">{isKhmer ? 'កាលបរិច្ឆេទ៖ ____ / ____ / ២០២__' : 'Date: _____ / _____ / 202___'}</p>
+          </div>
+
+          <div>
+            <p className="font-bold text-slate-900 font-khmer">{isKhmer ? 'បានពិនិត្យ និងផ្ទៀងផ្ទាត់' : 'Verified By'}</p>
+            <p className="text-[10px] text-slate-500">{isKhmer ? 'ប្រធានផ្នែកសិក្សាធិការ' : 'Head of Academic Affairs'}</p>
+            <div className="mt-14 border-b border-dotted border-slate-400 mx-8"></div>
+            <p className="text-[11px] text-slate-600 mt-1 font-medium">{isKhmer ? 'កាលបរិច្ឆេទ៖ ____ / ____ / ២០២__' : 'Date: _____ / _____ / 202___'}</p>
+          </div>
+
+          <div>
+            <p className="font-bold text-slate-900 font-khmer">{isKhmer ? 'បានឃើញ និងឯកភាព' : 'Approved By'}</p>
+            <p className="text-[10px] text-slate-500">{isKhmer ? 'នាយក / គណៈគ្រប់គ្រងសាលា' : 'School Director / Principal'}</p>
+            <div className="mt-14 border-b border-dotted border-slate-400 mx-8"></div>
+            <p className="text-[11px] text-slate-600 mt-1 font-medium">{isKhmer ? 'កាលបរិច្ឆេទ៖ ____ / ____ / ២០២__' : 'Date: _____ / _____ / 202___'}</p>
+          </div>
+        </div>
+
         {/* Footer Legend */}
-        <div className="flex flex-wrap items-center justify-between text-xs text-slate-500 pt-2 px-1">
+        <div className="flex flex-wrap items-center justify-between text-xs text-slate-500 pt-2 px-1 print:hidden">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 font-medium">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
