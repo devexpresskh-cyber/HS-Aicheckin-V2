@@ -12,16 +12,15 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
-  Languages,
-  Sparkles
+  Languages
 } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
-  const { loginWithGoogle, loginWithCredentials, loginAs, authError, setAuthError, isLoading, allUsers } = useAuth();
+  const { loginWithGoogle, loginWithCredentials, authError, setAuthError, isLoading } = useAuth();
   const { isKhmer, toggleLanguage, language, t } = useLanguage();
 
   const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('password123');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -54,51 +53,6 @@ export const LoginPage: React.FC = () => {
       setIsGoogleLoading(false);
     }
   };
-
-  // Find demo users
-  const superAdmin = allUsers.find(u => u.role === 'super_admin') || allUsers[0];
-  const hrAdmin = allUsers.find(u => u.role === 'admin_hr');
-  const supervisor = allUsers.find(u => u.role === 'supervisor');
-  const teacher = allUsers.find(u => u.role === 'teacher');
-  const employee = allUsers.find(u => u.role === 'employee');
-
-  const demoAccounts = [
-    {
-      user: superAdmin,
-      roleName: isKhmer ? 'អភិបាលជាន់ខ្ពស់' : 'Super Admin',
-      roleBadge: 'Super Admin',
-      color: 'border-purple-200 bg-purple-50/70 hover:bg-purple-100/80 text-purple-900',
-      badgeColor: 'bg-purple-600 text-white'
-    },
-    {
-      user: hrAdmin,
-      roleName: isKhmer ? 'ធនធានមនុស្ស / HR' : 'Admin / HR',
-      roleBadge: 'Admin HR',
-      color: 'border-blue-200 bg-blue-50/70 hover:bg-blue-100/80 text-blue-900',
-      badgeColor: 'bg-blue-600 text-white'
-    },
-    {
-      user: supervisor,
-      roleName: isKhmer ? 'ប្រធានដេប៉ាតឺម៉ង់' : 'Supervisor',
-      roleBadge: 'Supervisor',
-      color: 'border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100/80 text-emerald-900',
-      badgeColor: 'bg-emerald-600 text-white'
-    },
-    {
-      user: teacher,
-      roleName: isKhmer ? 'គ្រូបង្រៀន' : 'Teacher',
-      roleBadge: 'Teacher',
-      color: 'border-amber-200 bg-amber-50/70 hover:bg-amber-100/80 text-amber-900',
-      badgeColor: 'bg-amber-600 text-white'
-    },
-    {
-      user: employee,
-      roleName: isKhmer ? 'បុគ្គលិកទូទៅ' : 'IT Staff',
-      roleBadge: 'Employee',
-      color: 'border-slate-200 bg-slate-50/90 hover:bg-slate-100 text-slate-800',
-      badgeColor: 'bg-slate-700 text-white'
-    }
-  ].filter(item => item.user !== undefined);
 
   return (
     <div className={`min-h-screen w-full flex flex-col justify-between bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-slate-100 p-4 sm:p-6 lg:p-8 ${isKhmer ? 'font-khmer' : 'font-sans'}`}>
@@ -242,14 +196,9 @@ export const LoginPage: React.FC = () => {
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-bold text-slate-700">
-                    {isKhmer ? 'ពាក្យសម្ងាត់' : 'Password'}
-                  </label>
-                  <span className="text-[10px] text-slate-400">
-                    {isKhmer ? 'លំនាំដើម៖ password123' : 'Default: password123'}
-                  </span>
-                </div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  {isKhmer ? 'ពាក្យសម្ងាត់' : 'Password'}
+                </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
@@ -284,52 +233,6 @@ export const LoginPage: React.FC = () => {
                 )}
               </button>
             </form>
-
-            {/* Quick Demo Role Selector */}
-            <div className="pt-2">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  <span>{isKhmer ? 'ចូលភ្លាមៗជាមួយគណនីសាកល្បង (RBAC)' : 'Quick Demo Accounts (1-Click Login)'}</span>
-                </span>
-                <span className="text-[10px] text-slate-400 font-medium">
-                  {isKhmer ? 'ចុចដើម្បីចូល' : 'Click to test'}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {demoAccounts.map(item => {
-                  const u = item.user!;
-                  return (
-                    <button
-                      key={u.id}
-                      type="button"
-                      onClick={() => {
-                        loginAs(u.role);
-                      }}
-                      className={`flex items-center gap-2.5 p-2 rounded-xl border text-left transition-all ${item.color} group`}
-                    >
-                      <img
-                        src={u.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop'}
-                        alt={u.fullName}
-                        className="w-8 h-8 rounded-lg object-cover shrink-0 ring-1 ring-white/50"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1">
-                          <p className="text-xs font-bold truncate leading-tight">
-                            {isKhmer && u.khmerName ? u.khmerName.split(' ')[0] : u.fullName.split(' ')[0]}
-                          </p>
-                          <span className={`text-[8px] font-bold px-1 rounded uppercase tracking-wider shrink-0 ${item.badgeColor}`}>
-                            {item.roleBadge}
-                          </span>
-                        </div>
-                        <p className="text-[10px] text-slate-500 truncate">{u.email}</p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
 
           </div>
 

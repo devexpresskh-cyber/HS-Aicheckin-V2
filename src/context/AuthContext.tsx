@@ -200,9 +200,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (err?.code === 'auth/popup-closed-by-user') {
         setAuthError('Sign-in popup was closed before completing. Please try again.');
       } else if (err?.code === 'auth/popup-blocked') {
-        setAuthError('Sign-in popup was blocked by browser. Please allow popups or use demo login.');
+        setAuthError('Sign-in popup was blocked by browser. Please allow popups or use email sign-in.');
       } else {
-        setAuthError(err?.message || 'Google sign-in encountered an error. Please try again or use demo sign-in.');
+        setAuthError(err?.message || 'Google sign-in encountered an error. Please try again or sign in with your email / Staff ID.');
       }
       throw err;
     } finally {
@@ -241,7 +241,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     } else {
       setIsLoading(false);
-      setAuthError('Account not found with this email or staff ID. Please select one of the demo faculty accounts below.');
+      setAuthError('Account not found with this email or staff ID. Please verify your credentials or contact the administrator.');
       return false;
     }
   };
